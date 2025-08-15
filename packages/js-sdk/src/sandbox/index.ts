@@ -37,6 +37,13 @@ export interface SandboxOpts extends ConnectionOpts {
   envs?: Record<string, string>
 
   /**
+   * Secrets to be available in the sandbox.
+   *
+   * @default {}
+   */
+  secrets?: Record<string, string>
+
+  /**
    * Timeout for the sandbox in **milliseconds**.
    * Maximum time a sandbox can be kept alive is 24 hours (86_400_000 milliseconds) for Pro users and 1 hour (3_600_000 milliseconds) for Hobby users.
    *

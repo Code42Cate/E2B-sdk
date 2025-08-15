@@ -29,6 +29,11 @@ export interface SandboxCreateOpts extends SandboxApiOpts {
   envs?: Record<string, string>
 
   /**
+   * Secrets to be available in the sandbox
+   */
+  secrets?: Record<string, string>
+
+  /**
    * Envd is secured with access token and cannot be used without it
    */
   secure?: boolean
@@ -438,6 +443,7 @@ export class SandboxApi {
         templateID: template,
         metadata: opts?.metadata,
         envVars: opts?.envs,
+        secrets: opts?.secrets,
         timeout: this.timeoutToSeconds(timeoutMs),
         secure: opts?.secure,
         allow_internet_access: opts?.allowInternetAccess ?? true,

@@ -195,7 +195,7 @@ export interface paths {
             parameters: {
                 query?: {
                     end?: number;
-                    /** @description Starting timestamp of the metrics that should be returned in milliseconds */
+                    /** @description Unix timestamp for the start of the interval, in seconds, for which the metrics */
                     start?: number;
                 };
                 header?: never;
@@ -451,6 +451,109 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/secrets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List all team secrets */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of team secrets */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TeamSecret"][];
+                    };
+                };
+                401: components["responses"]["401"];
+                500: components["responses"]["500"];
+            };
+        };
+        put?: never;
+        /** @description Create a new team secret */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["NewTeamSecret"];
+                };
+            };
+            responses: {
+                /** @description Team secret created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CreatedTeamSecret"];
+                    };
+                };
+                401: components["responses"]["401"];
+                500: components["responses"]["500"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/secrets/{secretID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** @description Delete a team secret */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    secretID: components["parameters"]["secretID"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Team secret deleted successfully */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["401"];
+                404: components["responses"]["404"];
+                500: components["responses"]["500"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/teams": {
         parameters: {
             query?: never;
@@ -478,6 +581,52 @@ export interface paths {
                     };
                 };
                 401: components["responses"]["401"];
+                500: components["responses"]["500"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/teams/{teamID}/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get metrics for the team */
+        get: {
+            parameters: {
+                query?: {
+                    end?: number;
+                    /** @description Unix timestamp for the start of the interval, in seconds, for which the metrics */
+                    start?: number;
+                };
+                header?: never;
+                path: {
+                    teamID: components["parameters"]["teamID"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successfully returned the team metrics */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TeamMetric"][];
+                    };
+                };
+                400: components["responses"]["400"];
+                401: components["responses"]["401"];
+                403: components["responses"]["403"];
                 500: components["responses"]["500"];
             };
         };
@@ -970,6 +1119,43 @@ export interface components {
             /** @description Name of the API key */
             name: string;
         };
+        CreatedTeamSecret: {
+            /**
+             * Format: date-time
+             * @description When the secret was created
+             */
+            createdAt: string;
+            /** @description List of hosts where this secret can be used */
+            hosts: string[];
+            /**
+             * Format: uuid
+             * @description Identifier of the secret
+             */
+            id: string;
+            mask: components["schemas"]["IdentifierMaskingDetails"];
+            /** @description Name of the secret */
+            name: string;
+            /** @description Raw value of the secret (only shown on creation) */
+            value: string;
+        };
+        DiskMetrics: {
+            /** @description Device name */
+            device: string;
+            /** @description Filesystem type (e.g., ext4, xfs) */
+            filesystemType: string;
+            /** @description Mount point of the disk */
+            mountPoint: string;
+            /**
+             * Format: uint64
+             * @description Total space in bytes
+             */
+            totalBytes: number;
+            /**
+             * Format: uint64
+             * @description Used space in bytes
+             */
+            usedBytes: number;
+        };
         /**
          * Format: int32
          * @description Disk size for the sandbox in MiB
@@ -1052,6 +1238,7 @@ export interface components {
             autoPause: boolean;
             envVars?: components["schemas"]["EnvVars"];
             metadata?: components["schemas"]["SandboxMetadata"];
+            secrets?: components["schemas"]["Secrets"];
             /** @description Secure all system communication with sandbox */
             secure?: boolean;
             /** @description Identifier of the required template */
@@ -1067,19 +1254,17 @@ export interface components {
             /** @description Name of the API key */
             name: string;
         };
+        NewTeamSecret: {
+            /** @description List of hosts where this secret can be used */
+            hosts: string[];
+            /** @description Name of the secret */
+            name: string;
+            /** @description Value of the secret */
+            value: string;
+        };
         Node: {
-            /**
-             * Format: int32
-             * @description Number of allocated CPU cores
-             */
-            allocatedCPU: number;
-            /**
-             * Format: int32
-             * @description Amount of allocated memory in MiB
-             */
-            allocatedMemoryMiB: number;
             /** @description Identifier of the cluster */
-            clusterID?: string | null;
+            clusterID: string;
             /** @description Commit of the orchestrator */
             commit: string;
             /**
@@ -1092,10 +1277,11 @@ export interface components {
              * @description Number of sandbox create successes
              */
             createSuccesses: number;
+            metrics: components["schemas"]["NodeMetrics"];
             /** @description Identifier of the node */
             nodeID: string;
             /**
-             * Format: int32
+             * Format: uint32
              * @description Number of sandboxes running on the node
              */
             sandboxCount: number;
@@ -1112,7 +1298,7 @@ export interface components {
             /** @description List of cached builds id on the node */
             cachedBuilds: string[];
             /** @description Identifier of the cluster */
-            clusterID?: string | null;
+            clusterID: string;
             /** @description Commit of the orchestrator */
             commit: string;
             /**
@@ -1125,6 +1311,7 @@ export interface components {
              * @description Number of sandbox create successes
              */
             createSuccesses: number;
+            metrics: components["schemas"]["NodeMetrics"];
             /** @description Identifier of the node */
             nodeID: string;
             /** @description List of sandboxes running on the node */
@@ -1132,6 +1319,41 @@ export interface components {
             status: components["schemas"]["NodeStatus"];
             /** @description Version of the orchestrator */
             version: string;
+        };
+        /** @description Node metrics */
+        NodeMetrics: {
+            /**
+             * Format: uint32
+             * @description Number of allocated CPU cores
+             */
+            allocatedCPU: number;
+            /**
+             * Format: uint64
+             * @description Amount of allocated memory in bytes
+             */
+            allocatedMemoryBytes: number;
+            /**
+             * Format: uint32
+             * @description Total number of CPU cores on the node
+             */
+            cpuCount: number;
+            /**
+             * Format: uint32
+             * @description Node CPU usage percentage
+             */
+            cpuPercent: number;
+            /** @description Detailed metrics for each disk/mount point */
+            disks: components["schemas"]["DiskMetrics"][];
+            /**
+             * Format: uint64
+             * @description Total node memory in bytes
+             */
+            memoryTotalBytes: number;
+            /**
+             * Format: uint64
+             * @description Node memory used in bytes
+             */
+            memoryUsedBytes: number;
         };
         /**
          * @description Status of the node
@@ -1285,6 +1507,9 @@ export interface components {
          * @enum {string}
          */
         SandboxState: "running" | "paused";
+        Secrets: {
+            [key: string]: string;
+        };
         Team: {
             /** @description API key for the team */
             apiKey: string;
@@ -1314,6 +1539,41 @@ export interface components {
             lastUsed?: string | null;
             mask: components["schemas"]["IdentifierMaskingDetails"];
             /** @description Name of the API key */
+            name: string;
+        };
+        /** @description Team metric with timestamp */
+        TeamMetric: {
+            /**
+             * Format: int32
+             * @description The number of concurrent sandboxes for the team
+             */
+            concurrentSandboxes: number;
+            /**
+             * Format: float
+             * @description Number of sandboxes started per second
+             */
+            sandboxStartRate: number;
+            /**
+             * Format: date-time
+             * @description Timestamp of the metric entry
+             */
+            timestamp: string;
+        };
+        TeamSecret: {
+            /**
+             * Format: date-time
+             * @description When the secret was created
+             */
+            createdAt: string;
+            /** @description List of hosts where this secret can be used */
+            hosts: string[];
+            /**
+             * Format: uuid
+             * @description Identifier of the secret
+             */
+            id: string;
+            mask: components["schemas"]["IdentifierMaskingDetails"];
+            /** @description Name of the secret */
             name: string;
         };
         TeamUser: {
@@ -1481,6 +1741,15 @@ export interface components {
                 "application/json": components["schemas"]["Error"];
             };
         };
+        /** @description Forbidden */
+        403: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
         /** @description Not found */
         404: {
             headers: {
@@ -1515,6 +1784,8 @@ export interface components {
         buildID: string;
         nodeID: string;
         sandboxID: string;
+        secretID: string;
+        teamID: string;
         templateID: string;
     };
     requestBodies: never;

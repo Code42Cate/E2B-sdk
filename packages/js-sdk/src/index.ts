@@ -48,4 +48,8 @@ export type { SandboxOpts } from './sandbox'
 export type { SandboxInfo, SandboxMetrics } from './sandbox/sandboxApi'
 export { Sandbox }
 import { Sandbox } from './sandbox'
+
+export { Secret } from './secrets'
+export type { SecretsApiOpts, CreatedSecret } from './secrets'
+
 export default Sandbox
