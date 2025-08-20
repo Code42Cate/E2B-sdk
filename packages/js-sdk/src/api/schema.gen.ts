@@ -474,7 +474,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["TeamSecret"][];
+                        "application/json": components["schemas"]["Secret"][];
                     };
                 };
                 401: components["responses"]["401"];
@@ -492,7 +492,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["NewTeamSecret"];
+                    "application/json": components["schemas"]["NewSecret"];
                 };
             };
             responses: {
@@ -502,7 +502,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["CreatedTeamSecret"];
+                        "application/json": components["schemas"]["CreatedSecret"];
                     };
                 };
                 401: components["responses"]["401"];
@@ -1096,6 +1096,24 @@ export interface components {
             /** @description The fully created access token */
             token: string;
         };
+        CreatedSecret: {
+            /**
+             * Format: date-time
+             * @description When the secret was created
+             */
+            createdAt: string;
+            /** @description List of hosts where this secret can be used */
+            hosts: string[];
+            /**
+             * Format: uuid
+             * @description Identifier of the secret
+             */
+            id: string;
+            /** @description Name of the secret */
+            name: string;
+            /** @description Raw value of the secret (only shown on creation) */
+            value: string;
+        };
         CreatedTeamAPIKey: {
             /**
              * Format: date-time
@@ -1118,25 +1136,6 @@ export interface components {
             mask: components["schemas"]["IdentifierMaskingDetails"];
             /** @description Name of the API key */
             name: string;
-        };
-        CreatedTeamSecret: {
-            /**
-             * Format: date-time
-             * @description When the secret was created
-             */
-            createdAt: string;
-            /** @description List of hosts where this secret can be used */
-            hosts: string[];
-            /**
-             * Format: uuid
-             * @description Identifier of the secret
-             */
-            id: string;
-            mask: components["schemas"]["IdentifierMaskingDetails"];
-            /** @description Name of the secret */
-            name: string;
-            /** @description Raw value of the secret (only shown on creation) */
-            value: string;
         };
         DiskMetrics: {
             /** @description Device name */
@@ -1250,17 +1249,17 @@ export interface components {
              */
             timeout: number;
         };
-        NewTeamAPIKey: {
-            /** @description Name of the API key */
-            name: string;
-        };
-        NewTeamSecret: {
+        NewSecret: {
             /** @description List of hosts where this secret can be used */
             hosts: string[];
             /** @description Name of the secret */
             name: string;
             /** @description Value of the secret */
             value: string;
+        };
+        NewTeamAPIKey: {
+            /** @description Name of the API key */
+            name: string;
         };
         Node: {
             /** @description Identifier of the cluster */
@@ -1507,6 +1506,22 @@ export interface components {
          * @enum {string}
          */
         SandboxState: "running" | "paused";
+        Secret: {
+            /**
+             * Format: date-time
+             * @description When the secret was created
+             */
+            createdAt: string;
+            /** @description List of hosts where this secret can be used */
+            hosts: string[];
+            /**
+             * Format: uuid
+             * @description Identifier of the secret
+             */
+            id: string;
+            /** @description Name of the secret */
+            name: string;
+        };
         Secrets: {
             [key: string]: string;
         };
@@ -1558,23 +1573,6 @@ export interface components {
              * @description Timestamp of the metric entry
              */
             timestamp: string;
-        };
-        TeamSecret: {
-            /**
-             * Format: date-time
-             * @description When the secret was created
-             */
-            createdAt: string;
-            /** @description List of hosts where this secret can be used */
-            hosts: string[];
-            /**
-             * Format: uuid
-             * @description Identifier of the secret
-             */
-            id: string;
-            mask: components["schemas"]["IdentifierMaskingDetails"];
-            /** @description Name of the secret */
-            name: string;
         };
         TeamUser: {
             /** @description Email of the user */

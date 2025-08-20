@@ -12,7 +12,6 @@ export interface SecretsApiOpts
     >
   > {}
 
-
 /**
  * Information about a secret.
  */
@@ -28,24 +27,16 @@ export interface Secret {
   name: string
 
   /**
-   * List of hosts where this secret can be used
-   */
-  hosts: string[]
-
-  /**
    * When the secret was created
    */
   createdAt: Date
+}
 
+export interface SecretOpts extends ConnectionOpts {
   /**
-   * Masking details for the secret
+   * List of hosts where this secret can be used
    */
-  mask: {
-    maskedValuePrefix: string
-    maskedValueSuffix: string
-    prefix: string
-    valueLength: number
-  }
+  hosts?: string[]
 }
 
 /**
@@ -56,6 +47,8 @@ export interface CreatedSecret extends Secret {
    * Raw value of the secret (only shown on creation)
    */
   value: string
+
+  hosts: string[]
 }
 
 export class Secret {
@@ -82,12 +75,11 @@ export class Secret {
     }
 
     return (
-      res.data?.map((secret: components['schemas']['TeamSecret']) => ({
+      res.data?.map((secret: components['schemas']['Secret']) => ({
         id: secret.id,
         name: secret.name,
         hosts: secret.hosts,
         createdAt: new Date(secret.createdAt),
-        mask: secret.mask,
       })) ?? []
     )
   }
@@ -105,8 +97,7 @@ export class Secret {
   static async create(
     name: string,
     value: string,
-    hosts: string[],
-    opts?: SecretsApiOpts
+    opts?: SecretOpts
   ): Promise<CreatedSecret> {
     const config = new ConnectionConfig(opts)
     const client = new ApiClient(config)
@@ -115,7 +106,7 @@ export class Secret {
       body: {
         name: name,
         value: value,
-        hosts: hosts,
+        hosts: opts?.hosts ?? ['*'],
       },
       signal: config.getSignal(opts?.requestTimeoutMs),
     })
@@ -135,7 +126,6 @@ export class Secret {
       value: res.data.value,
       hosts: res.data.hosts,
       createdAt: new Date(res.data.createdAt),
-      mask: res.data.mask,
     }
   }
 
