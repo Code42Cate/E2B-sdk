@@ -1097,20 +1097,22 @@ export interface components {
             token: string;
         };
         CreatedSecret: {
+            /** @description List of allowlist where this secret can be used */
+            allowlist: string[];
             /**
              * Format: date-time
              * @description When the secret was created
              */
             createdAt: string;
-            /** @description List of hosts where this secret can be used */
-            hosts: string[];
+            /** @description Description of the secret */
+            description: string;
             /**
              * Format: uuid
              * @description Identifier of the secret
              */
             id: string;
-            /** @description Name of the secret */
-            name: string;
+            /** @description Label of the secret */
+            label: string;
             /** @description Raw value of the secret (only shown on creation) */
             value: string;
         };
@@ -1250,10 +1252,12 @@ export interface components {
             timeout: number;
         };
         NewSecret: {
-            /** @description List of hosts where this secret can be used */
-            hosts: string[];
-            /** @description Name of the secret */
-            name: string;
+            /** @description List of allowlist where this secret can be used */
+            allowlist: string[];
+            /** @description Description of the secret */
+            description: string;
+            /** @description Label of the secret */
+            label: string;
             /** @description Value of the secret */
             value: string;
         };
@@ -1507,20 +1511,22 @@ export interface components {
          */
         SandboxState: "running" | "paused";
         Secret: {
+            /** @description List of allowlist where this secret can be used */
+            allowlist: string[];
             /**
              * Format: date-time
              * @description When the secret was created
              */
             createdAt: string;
-            /** @description List of hosts where this secret can be used */
-            hosts: string[];
+            /** @description Description of the secret */
+            description?: string;
             /**
              * Format: uuid
              * @description Identifier of the secret
              */
             id: string;
-            /** @description Name of the secret */
-            name: string;
+            /** @description Label of the secret */
+            label: string;
         };
         Secrets: {
             [key: string]: string;

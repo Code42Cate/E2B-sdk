@@ -22,9 +22,9 @@ export interface Secret {
   id: string
 
   /**
-   * Name of the secret
+   * label of the secret
    */
-  name: string
+  label: string
 
   /**
    * When the secret was created
@@ -34,9 +34,14 @@ export interface Secret {
 
 export interface SecretOpts extends ConnectionOpts {
   /**
-   * List of hosts where this secret can be used
+   * List of allowlist where this secret can be used
    */
-  hosts?: string[]
+  allowlist?: string[]
+
+  /**
+   * Description of the secret
+   */
+  description?: string
 }
 
 /**
@@ -48,7 +53,7 @@ export interface CreatedSecret extends Secret {
    */
   value: string
 
-  hosts: string[]
+  allowlist: string[]
 }
 
 export class Secret {
@@ -77,8 +82,8 @@ export class Secret {
     return (
       res.data?.map((secret: components['schemas']['Secret']) => ({
         id: secret.id,
-        name: secret.name,
-        hosts: secret.hosts,
+        label: secret.label,
+        allowlist: secret.allowlist,
         createdAt: new Date(secret.createdAt),
       })) ?? []
     )
@@ -87,15 +92,15 @@ export class Secret {
   /**
    * Create a new secret.
    *
-   * @param name name of the secret.
+   * @param label label of the secret.
    * @param value value of the secret.
-   * @param hosts list of hosts where this secret can be used.
+   * @param allowlist list of allowlist where this secret can be used.
    * @param opts connection options.
    *
    * @returns created secret with value.
    */
   static async create(
-    name: string,
+    label: string,
     value: string,
     opts?: SecretOpts
   ): Promise<CreatedSecret> {
@@ -104,9 +109,10 @@ export class Secret {
 
     const res = await client.api.POST('/secrets', {
       body: {
-        name: name,
+        description: opts?.description ?? '',
+        label: label,
         value: value,
-        hosts: opts?.hosts ?? ['*'],
+        allowlist: opts?.allowlist ?? ['*'],
       },
       signal: config.getSignal(opts?.requestTimeoutMs),
     })
@@ -122,9 +128,9 @@ export class Secret {
 
     return {
       id: res.data.id,
-      name: res.data.name,
+      label: res.data.label,
       value: res.data.value,
-      hosts: res.data.hosts,
+      allowlist: res.data.allowlist,
       createdAt: new Date(res.data.createdAt),
     }
   }
