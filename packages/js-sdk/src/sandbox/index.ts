@@ -250,7 +250,24 @@ export class Sandbox extends SandboxApi {
       sandboxOpts
     )
 
-    return new this({ ...sandbox, ...config }) as InstanceType<S>
+    const instance = new this({ ...sandbox, ...config }) as InstanceType<S>
+
+    // post /config with mcp obj as json until you get 2xx code, then return, do it up to 20 times
+    if (sandboxOpts?.mcp) {
+      const mcpUrl = instance.getHost(8080)
+      for (let i = 0; i < 5; i++) {
+        const res = await fetch(`https://${mcpUrl}/config`, {
+          method: 'POST',
+          body: JSON.stringify(sandboxOpts?.mcp),
+        })
+        if (res.ok) {
+          break
+        }
+      }
+    }
+
+    return instance
+
   }
 
   /**
@@ -430,6 +447,14 @@ export class Sandbox extends SandboxApi {
     }
 
     return `${port}-${this.sandboxId}.${this.sandboxDomain}`
+  }
+
+  getMcpUrl() {
+    if (this.connectionConfig.debug) {
+      return `localhost:8080/mcp`
+    }
+
+    return `https://${this.getHost(8080)}/mcp`
   }
 
   /**
